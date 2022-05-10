@@ -1,8 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
 
 # Create your views here.
 from .models import *
+from .forms import OrderForm
+
+
 
 def home(requist):
     customers = Customer.objects.all()
@@ -38,3 +41,23 @@ def books(requist):
 
 def profile(requist):
     return render(requist, 'bookstore/profile.html')
+
+
+def create(request): 
+    form = OrderForm()
+    
+    # OrderFormSet = inlineformset_factory(Customer,Order,fields=('book', 'status'),extra=8)
+    # customer = Customer.objects.get(id=pk)
+    # formset = OrderFormSet(queryset = Order.objects.none(), instance=customer)
+    # # form = OrderForm()
+    if request.method == 'POST':
+    #    print(request.POST)
+       form = OrderForm(request.POST)
+    #   formset = OrderFormSet(request.POST , instance=customer)
+       if form.is_valid():
+          form.save()
+          return redirect('/')
+    # #context = {'form':form}
+    context = {'form':form}
+
+    return render(request , 'bookstore/my_order_form.html', context )

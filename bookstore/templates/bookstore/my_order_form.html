@@ -9,18 +9,14 @@
   <div class="card-body">
   
   <form action="" method="POST">
-  {% csrf_token %}
-  {{ formset.management_form }}
-  {% for item in  formset %}
-  {{item}} <br>
-  {% endfor %}
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+    {% csrf_token %}
+    {{ form }}
+    {% for item in  formset %}
+    {{item}} <br>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 
   </div>
 </div>
-
-
-
-
 {% endblock %}
