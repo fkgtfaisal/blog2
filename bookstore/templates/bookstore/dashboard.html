@@ -3,24 +3,23 @@
 {% block content %}
 
 <h1 class="p-5">Dashboard</h1>
- 
 
 <div class="container pb-5">
   <div class="row">
     <div class="col-sm">
-      Total Orders : <span class="badge badge-pill badge-primary">{{t_orders}}</span>
+      Total Orders : <span class="badge bg-info text-dark">{{t_orders}}</span>
     </div>
     <div class="col-sm">
-    Pending : <span class="badge badge-pill badge-danger">{{p_orders}}</span>
+    Pending : <span class="badge bg-danger">{{p_orders}}</span>
     </div>
     <div class="col-sm">
-     Delivered : <span class="badge badge-pill badge-success">{{d_orders}}</span>
+     Delivered : <span class="badge bg-success">{{d_orders}}</span>
     </div>
     <div class="col-sm">
-     In Progress :<span class="badge badge-pill badge-warning"> {{in_orders}}</span>
+     In Progress : <span class="badge bg-warning">{{in_orders}}</span>     
     </div>
     <div class="col-sm">
-      Out of Order : <span class="badge badge-pill badge-secondary">{{out_orders}}</span>
+      Out of Order : <span class="badge bg-secondary">{{out_orders}}</span>
     </div>
   </div>
 </div>
@@ -62,7 +61,6 @@
      <div class="card"  >
   <div class="card-body">
     <h5 class="card-title">Orders</h5>
-      {% comment %} <h6 class="card-subtitle mb-2 text-muted"><a class="btn btn-success" href="{% url 'create' %}">create</a></h6> {% endcomment %}
 <table class="table ">
   <thead>
     <tr> 

@@ -1,15 +1,15 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse 
 from .models import *
-from .forms import OrderForm #,CreateNewUser,CustomerForm
-# from .filters import OrderFilter
+from .forms import OrderForm 
+from .filters import OrderFilter
 from django.forms import inlineformset_factory
-from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate ,login  , logout 
-from django.contrib.auth.decorators import  login_required
-from .decorators import notLoggedUsers , allowedUsers, forAdmins
-from django.contrib.auth.models import Group
+# from django.contrib import messages
+# from django.contrib.auth.forms import UserCreationForm
+# from django.contrib.auth import authenticate ,login  , logout 
+# from django.contrib.auth.decorators import  login_required
+# from .decorators import notLoggedUsers , allowedUsers, forAdmins
+# from django.contrib.auth.models import Group
 
 
 
@@ -70,9 +70,8 @@ def profile(requist):
 
 
 
-def create(request, pk): 
-       
-    OrderFormSet = inlineformset_factory(Customer,Order,fields=('book', 'status'),extra=8)
+def create(request,pk): 
+    OrderFormSet = inlineformset_factory(Customer,Order,fields=('book', 'status'), extra = 8)
     customer = Customer.objects.get(id=pk)
     formset = OrderFormSet(queryset = Order.objects.none(), instance=customer)
     # form = OrderForm()
@@ -87,7 +86,6 @@ def create(request, pk):
     context = {'formset':formset}
 
     return render(request , 'bookstore/my_order_form.html', context )
-
 
 # ------------------
 def update(request,pk): 
