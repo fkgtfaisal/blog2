@@ -40,7 +40,7 @@ def books(requist):
 
 
 def profile(requist):
-    return render(requist, 'bookstore/profile.html')
+    return render(requist, 'bookstore/profile.html', {'profile': profile})
 
 
 def create(request): 
