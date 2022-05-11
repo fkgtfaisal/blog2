@@ -61,3 +61,28 @@ def create(request):
     context = {'form':form}
 
     return render(request , 'bookstore/my_order_form.html', context )
+
+def update(request,pk): 
+    order = Order.objects.get(id=pk)
+    form = OrderForm(instance=order) 
+    if request.method == 'POST': 
+       form = OrderForm(request.POST, instance=order)
+       if form.is_valid():
+           form.save()
+         
+           return redirect('/')
+
+    context = {'form':form}
+
+    return render(request , 'bookstore/my_order_form.html', context )
+
+
+def delete(request,pk): 
+    order = Order.objects.get(id=pk) 
+    if request.method == 'POST':  
+        order.delete()
+        return redirect('/')
+
+    context = {'order':order}
+
+    return render(request , 'bookstore/delete_form.html', context )

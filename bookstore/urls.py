@@ -8,7 +8,8 @@ urlpatterns = [
     path('books/', views.books, name="books"),
     path('profile/', views.profile, name="profile"),
     path('create/', views.create, name="create"),
-    
+    path('update/<str:pk>', views.update, name="update"),
+    path('delete/<str:pk>', views.delete, name="delete"),
 ]
 
 
