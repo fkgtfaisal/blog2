@@ -1,15 +1,15 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse 
 from .models import *
-from .forms import OrderForm 
+from .forms import OrderForm , CreateNewUser
 from .filters import OrderFilter
 from django.forms import inlineformset_factory
-# from django.contrib import messages
-# from django.contrib.auth.forms import UserCreationForm
-# from django.contrib.auth import authenticate ,login  , logout 
-# from django.contrib.auth.decorators import  login_required
-# from .decorators import notLoggedUsers , allowedUsers, forAdmins
-# from django.contrib.auth.models import Group
+from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate ,login  , logout 
+from django.contrib.auth.decorators import  login_required
+from .decorators import notLoggedUsers , allowedUsers, forAdmins
+from django.contrib.auth.models import User # Group
 
 
 
@@ -30,11 +30,12 @@ def customer(request,pk):
     orders = customer.order_set.all()
     number_orders = orders.count()
 
-    # searchFilter = OrderFilter(request.GET , queryset=orders)
-    # orders = searchFilter.qs
+    searchFilter = OrderFilter(request.GET , queryset=orders) # request.GET , queryset=orders
+    orders = searchFilter.qs
 
 
     context = {'customer': customer ,
+               'myFilter': searchFilter,
                'orders': orders,
                'number_orders': number_orders }
     return render(request , 'bookstore/customer.html',context)
@@ -112,3 +113,36 @@ def delete(request,pk):
     context = {'order':order}
 
     return render(request , 'bookstore/delete_form.html', context )
+
+
+
+def login(request): 
+    context = {}
+
+    return render(request , 'bookstore/login.html', context )
+
+def register(request):   
+            form = CreateNewUser()
+            if request.method == 'POST': 
+                   form = CreateNewUser(request.POST)
+                   if form.is_valid():
+
+                       recaptcha_response = request.POST.get('g-recaptcha-response')
+                       data = {
+                           'secret' : settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                           'response' : recaptcha_response
+                       }
+                       r = requests.post('https://www.google.com/recaptcha/api/siteverify',data=data)
+                       result = r.json()
+                       if result['success']:
+                           user = form.save()
+                           username = form.cleaned_data.get('username')
+                           messages.success(request , username + ' Created Successfully !')
+                           return redirect('login')
+                       else:
+                          messages.error(request ,  ' invalid Recaptcha please try again!')  
+ 
+        
+            context = {'form':form}
+
+            return render(request , 'bookstore/register.html', context )
