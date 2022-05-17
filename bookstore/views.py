@@ -6,14 +6,15 @@ from .filters import OrderFilter
 from django.forms import inlineformset_factory
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate , logout 
-from django.contrib.auth import authenticate ,login as myLogin
+from django.contrib.auth import authenticate , logout ,login
 from django.contrib.auth.decorators import  login_required
 from .decorators import notLoggedUsers , allowedUsers, forAdmins
 from django.contrib.auth.models import User # Group
 
 
-
+@login_required(login_url='login')
+# @allowedUsers(allowedGroups=['admin'])
+# @forAdmins
 def home(requist):
     customers = Customer.objects.all()
     orders = Order.objects.all()
@@ -26,6 +27,8 @@ def home(requist):
                'd_orders': d_orders,'in_orders': in_orders,'out_orders': out_orders}
     return render(requist, 'bookstore/dashboard.html',context)
 
+
+@login_required(login_url='login')
 def customer(request,pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
@@ -41,12 +44,14 @@ def customer(request,pk):
                'number_orders': number_orders }
     return render(request , 'bookstore/customer.html',context)
 
+
+@login_required(login_url='login')
 def books(requist):
     books = Book.objects.all()
     return render(requist, 'bookstore/books.html', {'books': books})
 
 
-
+@login_required(login_url='login')
 def profile(requist):
     return render(requist, 'bookstore/profile.html', {'profile': profile})
 
@@ -71,7 +76,7 @@ def profile(requist):
 #     return render(request , 'bookstore/my_order_form.html', context )
 
 
-
+@login_required(login_url='login')
 def create(request,pk): 
     OrderFormSet = inlineformset_factory(Customer,Order,fields=('book', 'status'), extra = 8)
     customer = Customer.objects.get(id=pk)
@@ -90,6 +95,7 @@ def create(request,pk):
     return render(request , 'bookstore/my_order_form.html', context )
 
 # ------------------
+@login_required(login_url='login')
 def update(request,pk): 
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order) 
@@ -104,7 +110,7 @@ def update(request,pk):
 
     return render(request , 'bookstore/my_order_form.html', context )
 
-
+@login_required(login_url='login')
 def delete(request,pk): 
     order = Order.objects.get(id=pk) 
     if request.method == 'POST':  
@@ -117,12 +123,16 @@ def delete(request,pk):
 
 
 
-def login(request): 
-    context = {}
+# def login(request): 
+#     context = {}
 
-    return render(request , 'bookstore/login.html', context )
+#     return render(request , 'bookstore/login.html', context )
 
-def register(request):   
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+
             form = CreateNewUser()
             if request.method == 'POST': 
                    form = CreateNewUser(request.POST)
@@ -151,29 +161,23 @@ def register(request):
         
         
         
-def userLogin(request):  
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    user = authenticate(request , username=username, password=password)
-    if user is not None:
-        myLogin(request, user)
+def userLogin(request):
+    if request.user.is_authenticated:
         return redirect('home')
-    else:
-        messages.info(request, 'Credentials error')
-   
-        # if request.method == 'POST': 
-        #     username = request.POST.get('username')
-        #     password = request.POST.get('password')
-        #     user = authenticate(request , username=username, password=password)
-        #     if user is not None:
-        #      login(request, user)
-        #      return redirect('home')
-        #     else:
-        #         messages.info(request, 'Credentials error')
+    else:        
+        if request.method == 'POST': 
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(request , username=username, password=password)
+            if user is not None:
+               login(request, user)
+               return redirect('home')
+            else:
+               messages.info(request, 'Credentials error')
     
-        context = {}
+    context = {}
 
-        return render(request , 'bookstore/login.html', context )
+    return render(request , 'bookstore/login.html', context )
 
 
 def userLogout(request):  
