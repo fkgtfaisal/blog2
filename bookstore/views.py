@@ -6,7 +6,8 @@ from .filters import OrderFilter
 from django.forms import inlineformset_factory
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import authenticate ,login  , logout 
+from django.contrib.auth import authenticate , logout 
+from django.contrib.auth import authenticate ,login as myLogin
 from django.contrib.auth.decorators import  login_required
 from .decorators import notLoggedUsers , allowedUsers, forAdmins
 from django.contrib.auth.models import User # Group
@@ -127,22 +128,54 @@ def register(request):
                    form = CreateNewUser(request.POST)
                    if form.is_valid():
 
-                       recaptcha_response = request.POST.get('g-recaptcha-response')
-                       data = {
-                           'secret' : settings.GOOGLE_RECAPTCHA_SECRET_KEY,
-                           'response' : recaptcha_response
-                       }
-                       r = requests.post('https://www.google.com/recaptcha/api/siteverify',data=data)
-                       result = r.json()
-                       if result['success']:
+                    #    recaptcha_response = request.POST.get('g-recaptcha-response')
+                    #    data = {
+                    #        'secret' : settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                    #        'response' : recaptcha_response
+                    #    }
+                    #    r = requests.post('https://www.google.com/recaptcha/api/siteverify',data=data)
+                    #    result = r.json()
+                    #    if result['success']:
                            user = form.save()
                            username = form.cleaned_data.get('username')
                            messages.success(request , username + ' Created Successfully !')
                            return redirect('login')
-                       else:
-                          messages.error(request ,  ' invalid Recaptcha please try again!')  
+                    #    else:
+                           messages.error(request ,  ' invalid Recaptcha please try again!')  
  
         
             context = {'form':form}
 
             return render(request , 'bookstore/register.html', context )
+        
+        
+        
+        
+def userLogin(request):  
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user = authenticate(request , username=username, password=password)
+    if user is not None:
+        myLogin(request, user)
+        return redirect('home')
+    else:
+        messages.info(request, 'Credentials error')
+   
+        # if request.method == 'POST': 
+        #     username = request.POST.get('username')
+        #     password = request.POST.get('password')
+        #     user = authenticate(request , username=username, password=password)
+        #     if user is not None:
+        #      login(request, user)
+        #      return redirect('home')
+        #     else:
+        #         messages.info(request, 'Credentials error')
+    
+        context = {}
+
+        return render(request , 'bookstore/login.html', context )
+
+
+def userLogout(request):  
+    logout(request)
+    return redirect('login') 
