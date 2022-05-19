@@ -41,7 +41,8 @@ def customer(request,pk):
     context = {'customer': customer ,
                'myFilter': searchFilter,
                'orders': orders,
-               'number_orders': number_orders }
+               'number_orders': number_orders,
+               'remark':remark }
     return render(request , 'bookstore/customer.html',context)
 
 
