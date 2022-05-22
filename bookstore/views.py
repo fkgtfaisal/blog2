@@ -13,8 +13,8 @@ from django.contrib.auth.models import User # Group
 
 
 @login_required(login_url='login')
-# @allowedUsers(allowedGroups=['admin'])
-# @forAdmins
+@allowedUsers(allowedGroups=['admin'])
+@forAdmins
 def home(requist):
     customers = Customer.objects.all()
     orders = Order.objects.all()
@@ -78,6 +78,7 @@ def profile(requist):
 
 
 @login_required(login_url='login')
+@allowedUsers(allowedGroups=['admin'])
 def create(request,pk): 
     OrderFormSet = inlineformset_factory(Customer,Order,fields=('book', 'status'), extra = 8)
     customer = Customer.objects.get(id=pk)
@@ -97,6 +98,7 @@ def create(request,pk):
 
 # ------------------
 @login_required(login_url='login')
+@allowedUsers(allowedGroups=['admin'])
 def update(request,pk): 
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order) 
@@ -112,6 +114,7 @@ def update(request,pk):
     return render(request , 'bookstore/my_order_form.html', context )
 
 @login_required(login_url='login')
+@allowedUsers(allowedGroups=['admin'])
 def delete(request,pk): 
     order = Order.objects.get(id=pk) 
     if request.method == 'POST':  
@@ -128,7 +131,7 @@ def delete(request,pk):
 #     context = {}
 
 #     return render(request , 'bookstore/login.html', context )
-
+@notLoggedUsers
 def register(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -161,11 +164,8 @@ def register(request):
         
         
         
-        
+@notLoggedUsers        
 def userLogin(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    else:        
         if request.method == 'POST': 
             username = request.POST.get('username')
             password = request.POST.get('password')
@@ -176,11 +176,15 @@ def userLogin(request):
             else:
                messages.info(request, 'Credentials error')
     
-    context = {}
+        context = {}
 
-    return render(request , 'bookstore/login.html', context )
+        return render(request , 'bookstore/login.html', context )
 
 
 def userLogout(request):  
     logout(request)
     return redirect('login') 
+
+def userProfile(request):  
+    context = {}
+    return render(request , 'bookstore/profile.html', context )
