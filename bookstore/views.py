@@ -9,7 +9,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate , logout ,login
 from django.contrib.auth.decorators import  login_required
 from .decorators import notLoggedUsers , allowedUsers, forAdmins
-from django.contrib.auth.models import User # Group
+from django.contrib.auth.models import Group
 
 
 @login_required(login_url='login')
@@ -42,7 +42,7 @@ def customer(request,pk):
                'myFilter': searchFilter,
                'orders': orders,
                'number_orders': number_orders,
-               'remark':remark }
+                }
     return render(request , 'bookstore/customer.html',context)
 
 
@@ -97,6 +97,23 @@ def create(request,pk):
     return render(request , 'bookstore/my_order_form.html', context )
 
 # ------------------
+# @login_required(login_url='login')
+# @allowedUsers(allowedGroups=['admin'])
+# def update(request,pk): 
+#     order = Order.objects.get(id=pk)
+#     form = OrderForm(instance=order) 
+#     if request.method == 'POST': 
+#        form = OrderForm(request.POST, instance=order)
+#        if form.is_valid():
+#            form.save()
+         
+#            return redirect('/')
+
+#     context = {'form':form}
+
+#     return render(request , 'bookstore/my_order_form.html', context )
+
+
 @login_required(login_url='login')
 @allowedUsers(allowedGroups=['admin'])
 def update(request,pk): 
@@ -112,6 +129,7 @@ def update(request,pk):
     context = {'form':form}
 
     return render(request , 'bookstore/my_order_form.html', context )
+
 
 @login_required(login_url='login')
 @allowedUsers(allowedGroups=['admin'])
@@ -133,10 +151,6 @@ def delete(request,pk):
 #     return render(request , 'bookstore/login.html', context )
 @notLoggedUsers
 def register(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    else:
-
             form = CreateNewUser()
             if request.method == 'POST': 
                    form = CreateNewUser(request.POST)
@@ -185,6 +199,8 @@ def userLogout(request):
     logout(request)
     return redirect('login') 
 
+@login_required(login_url='login')
+@allowedUsers(allowedGroups=['customer'])  
 def userProfile(request):  
     context = {}
     return render(request , 'bookstore/profile.html', context )
