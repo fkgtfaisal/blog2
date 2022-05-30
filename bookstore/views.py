@@ -200,7 +200,23 @@ def userLogout(request):
     return redirect('login') 
 
 @login_required(login_url='login')
-@allowedUsers(allowedGroups=['customer'])  
+@allowedUsers(allowedGroups=['customer'])
 def userProfile(request):  
-    context = {}
+     
+    orders = request.user.customer.order_set.all()
+
+    t_orders = orders.count()
+    p_orders = orders.filter(status='Pending').count()
+    d_orders = orders.filter(status='Delivered').count()
+    in_orders = orders.filter(status='in progress').count()
+    out_orders = orders.filter(status='out of order').count()
+    context = { 
+               'orders': orders,
+               't_orders': t_orders,
+               'p_orders': p_orders,
+               'd_orders': d_orders,
+               'in_orders': in_orders,
+               'out_orders': out_orders}
+
+    
     return render(request , 'bookstore/profile.html', context )
